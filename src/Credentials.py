@@ -48,7 +48,6 @@ class Credentials:
                 credentials_id = 0
             # store the ID we're using
             flag.set(flag_id, credentials_id)
-        credentials[credentials_id]['credentials_id'] = credentials_id
         # return the credentials set we obtained
         return credentials[credentials_id]
 
