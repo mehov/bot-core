@@ -1,5 +1,5 @@
-from src.Config import Config
-from src.Flag import Flag
+from bot_core.Config import Config
+from bot_core.Flag import Flag
 import json
 
 
