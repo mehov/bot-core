@@ -51,6 +51,9 @@ class Credentials:
         # return the credentials set we obtained
         return credentials[credentials_id]
 
+    def set(self, credentials):
+        self.config.set('USER_ROTATING_CREDENTIALS', json.dumps(credentials))
+
     # removes a set of credentials from the config file
     def discard(self, credential):
         new_credentials = []
@@ -58,4 +61,4 @@ class Credentials:
         for c in credentials:
             if not c['access_token'] == credential['access_token']:
                 new_credentials.append(c)
-        self.config.set('USER_ROTATING_CREDENTIALS', json.dumps(new_credentials))
+        self.set(new_credentials)
