@@ -45,6 +45,8 @@ class Commands:
             # If we do have a handler after all, register it with Telegram
             if handler is not None:
                 self.application.add_handler(handler)
+            else:
+                print(f'Handler for {file_name}/{camel_case} is None')
         # Add menu buttons
         self.menu_buttons += [telegram.BotCommand(name, 'Run /' + name) for name in file_names]
 
