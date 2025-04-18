@@ -7,6 +7,7 @@ class Commands:
 
     def __init__(self, application):
         self.application = application
+        self.menu_buttons = []
 
     def scan_dir(self, path):
         commands = [
@@ -15,14 +16,15 @@ class Commands:
         ]
         return commands
 
-    async def register(self, path):
+    async def register(self, path, module_name=None):
         """
         Registers all Commands and Conversations found in path with Telegram
         (Conversations have multiple steps as opposed to Commands)
         :param path: directory to scan for files
         :return: None
         """
-        module_name = os.path.basename(path)  # last piece in path
+        if not module_name:
+            module_name = os.path.basename(path)  # last piece in path
         file_names = self.scan_dir(path)  # scan this path for files
         for file_name in file_names:
             handler = None  # default to None
@@ -44,6 +46,11 @@ class Commands:
             if handler is not None:
                 self.application.add_handler(handler)
         # Add menu buttons
-        buttons_list = [telegram.BotCommand(name, 'Run /' + name) for name in file_names]
+        self.menu_buttons += [telegram.BotCommand(name, 'Run /' + name) for name in file_names]
+
+    async def register_core(self):
+        await self.register(os.path.abspath(os.path.join(os.path.dirname(__file__), 'commands')), 'bot_core.commands')
+
+    async def save_menu_buttons(self):
         await self.application.bot.set_chat_menu_button(menu_button=telegram.MenuButtonCommands())
-        await self.application.bot.set_my_commands(buttons_list)
+        await self.application.bot.set_my_commands(self.menu_buttons)
