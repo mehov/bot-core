@@ -47,6 +47,14 @@ class Config:
             for (key, value) in self.config.items(section):
                 self.cache[f'{section}_{key}'.upper()] = value
 
+    def user_config(self, user_id=None):
+        if not user_id:
+            user_id = self.user_id
+        section_name = f'USER{user_id}'
+        if not self.config.has_section(section_name):
+            return None
+        return self.config.items(section_name)
+
     def get(self, name):
         # Make sure name is all uppercase
         name = name.upper()
