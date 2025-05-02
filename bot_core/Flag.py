@@ -4,11 +4,12 @@ from .utils import app_identifier
 
 class Flag:
 
-    def __init__(self):
+    def __init__(self, directory='/tmp'):
+        self.directory = directory
         self.prefix = app_identifier()
 
     def path(self, flag_id):
-        return f"/tmp/{self.prefix}-{flag_id}.flag"
+        return f"{self.directory}/{self.prefix}-{flag_id}.flag"
 
     def check(self, flag_id):
         path = self.path(flag_id)
