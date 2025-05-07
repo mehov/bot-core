@@ -7,6 +7,7 @@ from telegram.ext import (
 
 
 class HelloWorldCommand(BaseCommand):
+    """Say hello"""
 
     async def hello_world_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await update.message.reply_text('Hello World!')

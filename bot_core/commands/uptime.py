@@ -8,6 +8,7 @@ from telegram.ext import (
 
 
 class UptimeCommand(BaseCommand):
+    """Report bot status and uptime"""
 
     async def uptime_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         try:

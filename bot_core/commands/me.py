@@ -8,6 +8,7 @@ from telegram.ext import (
 
 
 class MeCommand(BaseCommand):
+    """Report current user data"""
 
     async def handle(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         config = bot_core.Config.Config(update.message.from_user.id)
