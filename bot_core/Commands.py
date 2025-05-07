@@ -20,6 +20,7 @@ class Commands:
         """
         Registers all Commands and Conversations found in path with Telegram
         (Conversations have multiple steps as opposed to Commands)
+        :param module_name: specify if cannot be derived from path
         :param path: directory to scan for files
         :return: None
         """
