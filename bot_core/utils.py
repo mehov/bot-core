@@ -25,3 +25,18 @@ def run_command(command, arguments=None):
         return result.returncode, result.stdout.strip()
     except subprocess.CalledProcessError as e:
         return e.returncode, str(e) + "\n\n" + e.stderr.strip()
+
+
+def commit_id():
+    result = run_command('git', ['rev-parse', '--short', 'HEAD'])
+    if result[0] == 0:
+        return result[1]
+    return '?'
+
+
+def commit_message():
+    result = run_command('git', ['log', '-1', '--pretty=%B'])
+    if result[0] == 0:
+        return result[1]
+    return '?'
+

@@ -1,5 +1,5 @@
+import bot_core.utils
 from . import BaseCommand
-from bot_core.utils import run_command
 from telegram import Update
 from telegram.ext import (
     CommandHandler,
@@ -12,8 +12,10 @@ class UptimeCommand(BaseCommand):
 
     async def uptime_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         report = {
-            'uptime': run_command('uptime')[1],
-            'since': run_command('uptime', ['-s'])[1],
+            'uptime': bot_core.utils.run_command('uptime')[1],
+            'since': bot_core.utils.run_command('uptime', ['-s'])[1],
+            'version': bot_core.utils.commit_id(),
+            'message': bot_core.utils.commit_message(),
         }
         reply = ''
         for key, value in report.items():
