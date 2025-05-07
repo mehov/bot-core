@@ -25,6 +25,8 @@ def run_command(command, arguments=None):
         return result.returncode, result.stdout.strip()
     except subprocess.CalledProcessError as e:
         return e.returncode, str(e) + "\n\n" + e.stderr.strip()
+    except FileNotFoundError as e:
+        return 127, str(e)
 
 
 def commit_id():
