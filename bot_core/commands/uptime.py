@@ -16,7 +16,7 @@ class UptimeCommand(BaseCommand):
                                     check=True)
             reply = result.stdout.strip()
         except subprocess.CalledProcessError as e:
-            reply = e
+            reply = str(e)
         await update.message.reply_text(reply)
 
     def get_handler(self):
