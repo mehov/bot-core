@@ -43,13 +43,13 @@ class Commands:
                 command_ref = getattr(module, camel_case + 'Command')
                 instance = command_ref()
                 handler = instance.get_handler()  # get the handler
-            # If we do have a handler after all, register it with Telegram
-            if handler is not None:
-                self.application.add_handler(handler)
-            else:
+            if handler is None:
                 print(f'Handler for {file_name}/{camel_case} is None')
-        # Add menu buttons
-        self.menu_buttons += [telegram.BotCommand(name, 'Run /' + name) for name in file_names]
+                continue
+            # If we do have a handler after all, register it with Telegram
+            self.application.add_handler(handler)
+            # Add menu button
+            self.menu_buttons.append(telegram.BotCommand(file_name, 'Runno /' + file_name))
 
     async def register_core(self):
         await self.register(os.path.abspath(os.path.join(os.path.dirname(__file__), 'commands')), 'bot_core.commands')
