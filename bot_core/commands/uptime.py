@@ -11,11 +11,13 @@ class UptimeCommand(BaseCommand):
     """Report bot status and uptime"""
 
     async def uptime_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+        webhook_info = await context.bot.get_webhook_info()
         report = {
             'uptime': bot_core.utils.run_command('uptime')[1],
             'since': bot_core.utils.run_command('uptime', ['-s'])[1],
             'version': bot_core.utils.commit_id(),
             'message': bot_core.utils.commit_message(),
+            'webhook': webhook_info,
         }
         reply = ''
         for key, value in report.items():
