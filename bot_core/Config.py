@@ -1,5 +1,6 @@
 import os
 import configparser
+import json
 from .utils import app_identifier
 
 
@@ -30,13 +31,6 @@ class Config:
             if os.path.splitext(f)[0].isidentifier() and not f.startswith('__')
         ]
         return user_ids
-
-    def new_user(self, user_data):
-        name = f"USER{user_data['id']}"
-        new_config = configparser.ConfigParser()
-        new_config[name] = user_data # section name same as file name
-        write_config(self.user_dir + '/' + name + '.ini', new_config)
-        self.read()
 
     def read(self):
         self.cache = {}
@@ -95,3 +89,10 @@ class Config:
         # Finally, write the actual INI file
         write_config(path, temp_config)
         self.read()
+
+    def new_user(self, user_id, user_data):
+        self.user_id = user_id
+        for key, value in user_data.items():
+            self.set(f'USER_{key}', value)
+        self.read()
+
