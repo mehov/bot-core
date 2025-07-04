@@ -1,5 +1,5 @@
 import datetime
-from .Config import Config
+from . import Config
 from .utils import app_identifier
 from flask import jsonify, request
 from telegram import Update

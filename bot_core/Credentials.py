@@ -1,5 +1,4 @@
-from bot_core.Config import Config
-from bot_core.Flag import Flag
+import bot_core
 import json
 
 
@@ -7,7 +6,7 @@ class Credentials:
 
     def __init__(self, user_id):
         self.user_id = user_id
-        self.config = Config(user_id)
+        self.config = bot_core.Config(user_id)
 
     def count(self):
         credentials = self.all()
@@ -34,7 +33,7 @@ class Credentials:
         if force_use_credentials_id:
             credentials_id = force_use_credentials_id
         else:
-            flag = Flag()
+            flag = bot_core.Flag()
             # try reading the flag file, defaulting to ID = 0
             flag_id = f'credentials-{self.user_id}'
             flagged = flag.get(flag_id)

@@ -1,5 +1,5 @@
 from . import BaseCommand
-from bot_core.Config import Config
+from bot_core import Config
 from telegram import Update
 from telegram.ext import (
     CommandHandler,
