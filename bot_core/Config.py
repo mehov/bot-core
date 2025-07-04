@@ -66,6 +66,9 @@ class Config:
     def set(self, name, value):
         # Make sure name is all uppercase
         name = name.upper()
+        # Make sure dict values are flattened to a valid JSON string
+        if isinstance(value, dict):
+            value = json.dumps(value)
         # Cache in environment
         os.environ[name] = value
         # Proceed writing to INI
