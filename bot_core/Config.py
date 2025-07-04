@@ -24,12 +24,12 @@ class Config:
         # Read and cache all INIs
         self.read()
 
-    def list_users(self):
-        users = [
-            os.path.splitext(f)[0] for f in os.listdir(self.user_dir)
+    def list_user_ids(self):
+        user_ids = [
+            os.path.splitext(f)[0][len('USER'):] for f in os.listdir(self.user_dir)
             if os.path.splitext(f)[0].isidentifier() and not f.startswith('__')
         ]
-        return users
+        return user_ids
 
     def new_user(self, user_data):
         name = f"USER{user_data['id']}"
@@ -41,7 +41,7 @@ class Config:
     def read(self):
         self.cache = {}
         self.path = os.path.dirname(os.path.dirname(__file__)) + "/config.ini"
-        paths = [self.path] + [f'{self.user_dir}/{u}.ini' for u in self.list_users()]
+        paths = [self.path] + [f'{self.user_dir}/USER{id}.ini' for id in self.list_user_ids()]
         self.config.read(paths)
         for section in self.config.sections():
             for (key, value) in self.config.items(section):
