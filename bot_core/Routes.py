@@ -15,11 +15,17 @@ class Routes:
         self.telegram_app = telegram_app
 
     async def register_core(self):
-        for f in ['home', 'webhook_endpoint']:
-            if f not in self.flask_app.view_functions:
-                handler = getattr(self, f, None)
-                if handler:
-                    await handler()
+        handlers = {
+            'home': None,
+            'webhook_endpoint': None,
+            'solve_captcha': bot_core.solve_captcha.Routes(self.flask_app, self.telegram_app),
+        }
+        for name, handler_obj in handlers.items():
+            if name in self.flask_app.view_functions:
+                continue
+            handler = getattr(handler_obj or self, name, None)
+            if handler:
+                await handler()
 
     async def home(self):
         @self.flask_app.route('/')
