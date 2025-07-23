@@ -18,7 +18,6 @@ class Routes:
         handlers = {
             'home': None,
             'webhook_endpoint': None,
-            'solve_captcha': bot_core.solve_captcha.Routes(self.flask_app, self.telegram_app),
         }
         for name, handler_obj in handlers.items():
             if name in self.flask_app.view_functions:
