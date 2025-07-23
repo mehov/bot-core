@@ -28,7 +28,7 @@ class Config:
     def list_user_ids(self):
         user_ids = [
             os.path.splitext(f)[0][len('USER'):] for f in os.listdir(self.user_dir)
-            if os.path.splitext(f)[0].isidentifier() and not f.startswith('__')
+            if os.path.splitext(f)[0].isidentifier() and f.endswith('.ini') and not f.startswith('__')
         ]
         return user_ids
 
