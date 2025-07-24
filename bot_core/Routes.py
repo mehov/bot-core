@@ -1,5 +1,5 @@
 import datetime
-from . import Config
+from . import Config, Proxy
 from .utils import app_identifier
 from flask import jsonify, request
 from telegram import Update
@@ -18,6 +18,7 @@ class Routes:
         handlers = {
             'home': None,
             'webhook_endpoint': None,
+            'proxy_routes': Proxy(),
         }
         for name, handler_obj in handlers.items():
             if name in self.flask_app.view_functions:
