@@ -24,10 +24,10 @@ class Routes:
                 continue
             handler = getattr(handler_obj or self, name, None)
             if handler:
-                await handler()
+                await handler(self.flask_app, self.telegram_app)
 
-    async def home(self):
-        @self.flask_app.route('/')
+    async def home(self, flask_app, telegram_app):
+        @flask_app.route('/')
         async def home():
             return jsonify(
                 app_name=app_identifier(),
@@ -35,7 +35,7 @@ class Routes:
                 now=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             ), 200
 
-    async def webhook_endpoint(self):
+    async def webhook_endpoint(self, flask_app, telegram_app):
         # set webhook if HTTP_HOSTNAME present in environment
         hostname = config.get('HTTP_HOSTNAME')
         if hostname is None:
@@ -45,12 +45,12 @@ class Routes:
         # "webhook can be set up only on ports 80, 88, 443 or 8443"
         webhook_url = f"https://{hostname}/webhook-endpoint"
         print(f"Setting webhook URL to: {webhook_url}")
-        await self.telegram_app.bot.set_webhook(webhook_url)
+        await telegram_app.bot.set_webhook(webhook_url)
 
-        @self.flask_app.route('/webhook-endpoint', methods=['POST'])
+        @flask_app.route('/webhook-endpoint', methods=['POST'])
         async def webhook_endpoint():
-            update = Update.de_json(request.get_json(), self.telegram_app.bot)
-            await self.telegram_app.process_update(update)
+            update = Update.de_json(request.get_json(), telegram_app.bot)
+            await telegram_app.process_update(update)
             return jsonify(
                 status='OK',
             ), 200
