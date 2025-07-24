@@ -47,8 +47,8 @@ class Credentials:
                 credentials_id = 0
             # store the ID we're using
             flag.set(flag_id, credentials_id)
-        # return the credentials set we obtained
-        return credentials[credentials_id]
+        # return credentials_id and credentials set we obtained as tuple
+        return credentials_id, credentials[credentials_id]
 
     def set(self, credentials):
         self.config.set('USER_ROTATING_CREDENTIALS', json.dumps(credentials))
