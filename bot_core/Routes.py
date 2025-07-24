@@ -1,5 +1,5 @@
 import datetime
-from . import Config, Proxy
+from . import Captcha, Config, Proxy
 from .utils import app_identifier
 from flask import jsonify, request
 from telegram import Update
@@ -19,6 +19,7 @@ class Routes:
             'home': None,
             'webhook_endpoint': None,
             'proxy_routes': Proxy(),
+            'captcha_routes': Captcha(),
         }
         for name, handler_obj in handlers.items():
             if name in self.flask_app.view_functions:

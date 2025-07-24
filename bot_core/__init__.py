@@ -1,3 +1,4 @@
+from .Captcha import Captcha
 from .Config import Config
 from .Commands import Commands
 from .Credentials import Credentials
