@@ -41,6 +41,7 @@ class Proxy:
                     headers['User-Agent'] = user_agent
                 if referer:
                     headers['Referer'] = referer
+                headers['Accept-Encoding'] = 'identity'
 
                 # Forward received query params (excluding 'url', 'user_agent', 'referer' which are for proxy itself)
                 forwarded_params = {k: v for k, v in request.args.items() if k not in ('url', 'user_agent', 'referer')}
