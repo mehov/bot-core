@@ -6,9 +6,10 @@
         <script type="text/javascript" src="{{ url_for('bot_core.static', filename='captcha_providers/'~provider~'.js') }}"></script>
     </head>
     <body>
-        <iframe src="{{ proxy_url }}" id="captcha"></iframe>
+        <iframe src="{{ iframe_src }}" id="captcha"></iframe>
         <script type="text/javascript">
             user_id = '{{ user_id }}';
+            challenge_id = '{{ challenge_id }}';
             credentials_id = '{{ credentials_id }}';
             provider = '{{ provider }}';
             captcha_url = '{{ captcha_url }}';

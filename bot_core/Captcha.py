@@ -3,11 +3,15 @@ from flask import request, render_template, Blueprint
 from jinja2 import ChoiceLoader, FileSystemLoader
 import bot_core
 import importlib
+import json
 import os
 
 class Captcha:
 
-    def our_url(self, user_id, credentials_id, provider, captcha_url, user_agent=None):
+    def challenge_path(self, id):
+        return f'/tmp/captcha-challenge-{id}'
+
+    def our_url(self, user_id, credentials_id, provider, captcha_url, challenge=None, user_agent=None):
         """Convenience function to return URL where we re-serve the CAPTCHA
 
         Arguments:
@@ -15,17 +19,26 @@ class Captcha:
         credentials_id  specific set used when hit with CAPTCHA
         provider
         captcha_url
+        challenge  HTML code for CAPTCHA page (e.g. Cloudflare)
         user_agent  original user agent, use when proxying CAPTCHA requests
         """
-        query = {
+        import hashlib
+        challenge = challenge or ''  # + and f.write need challenge to be string
+        challenge_id = hashlib.sha256((challenge + captcha_url).encode('utf-8')).hexdigest()
+        challenge_path = self.challenge_path(challenge_id)
+        with open(challenge_path, 'w') as f:
+            f.write(challenge)
+        metadata = {
             'user_id': user_id,
             'credentials_id': credentials_id,
             'provider': provider,
             'captcha_url': captcha_url,
         }
         if user_agent:
-            query['user_agent'] = user_agent
-        return bot_core.utils.app_url()+'/captcha?'+urlencode(query)
+            metadata['user_agent'] = user_agent
+        with open(challenge_path + '.json', 'w') as f:
+            json.dump(metadata, f)
+        return bot_core.utils.app_url()+'/captcha?'+urlencode({'challenge_id': challenge_id})
 
     async def captcha_routes(self, flask_app, telegram_app):
         # Path to bot_core root containing /static and /templates
@@ -45,17 +58,42 @@ class Captcha:
         # Define Flask route where we re-serve the CAPTCHA we received
         @flask_app.route('/captcha')
         def captcha_serve_route():
-            captcha_url = request.args.get('captcha_url')
-            user_agent = request.args.get('user_agent')
+            challenge_id = request.args.get('challenge_id')
+            challenge_path = self.challenge_path(challenge_id)
+            if not os.path.exists(challenge_path):
+                return 'Provided challenge_id is not valid', 404
+            if not os.path.exists(challenge_path + '.json'):
+                return 'Challenge metadata missing', 500
+            # Read challenge metadata into dict
+            metadata = json.load(open(challenge_path + '.json'))
             return render_template(
                 'captcha.html',
-                provider = request.args.get('provider'),
-                user_id = request.args.get('user_id'),
-                credentials_id = request.args.get('credentials_id'),
-                captcha_url = captcha_url,
-                user_agent = user_agent,
-                proxy_url = bot_core.Proxy().our_url(url=captcha_url, user_agent=user_agent)
+                provider = metadata.get('provider'),
+                user_id = metadata.get('user_id'),
+                challenge_id = challenge_id,
+                credentials_id = metadata.get('credentials_id'),
+                captcha_url = metadata.get('captcha_url'),
+                user_agent = metadata.get('user_agent'),
+                iframe_src = '/captcha-challenge?'+urlencode({'challenge_id': challenge_id})
             )
+        # Define Flask route used as our-origin iframe SRC where we serve CAPTCHA challenge code
+        @flask_app.route('/captcha-challenge', methods=['GET'])
+        def captcha_challenge_route():
+            from flask import redirect
+            import base64
+            challenge_id = request.args.get('challenge_id')
+            challenge_path = self.challenge_path(challenge_id)
+            if not os.path.exists(challenge_path):
+                return 'Provided challenge_id is not valid', 404
+            if not os.path.exists(challenge_path + '.json'):
+                return 'Challenge metadata missing', 500
+            # Read challenge content into variable
+            with open(challenge_path) as f:
+                challenge = f.read()
+            metadata = json.load(open(challenge_path + '.json'))
+            if len(challenge) == 0 & metadata.get('captcha_url').startswith('http'):
+                return redirect(bot_core.Proxy().our_url(url=metadata.get('captcha_url'), user_agent=metadata.get('user_agent')), code=301)
+            return challenge.encode('utf-8'), 200
         # Define Flask route where we save the CAPTCHA result for given user_id and provider
         @flask_app.route('/captcha-result', methods=['POST'])
         def captcha_result_route():
