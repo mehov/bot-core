@@ -18,7 +18,7 @@ def app_identifier() -> str:
 
 def app_url() -> str:
     env_port = os.getenv('HTTP_PORT')
-    return '//' + (os.getenv('HTTP_HOST') or '127.0.0.1') + (f':{env_port}' if env_port else '')
+    return '//' + (os.getenv('HTTP_HOST') or os.getenv('HTTP_HOSTNAME') or '127.0.0.1') + (f':{env_port}' if env_port else '')
 
 
 def run_command(command, arguments=None):
