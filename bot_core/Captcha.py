@@ -42,12 +42,14 @@ class Captcha:
 
     async def captcha_routes(self, flask_app, telegram_app):
         # Path to bot_core root containing /static and /templates
-        bot_core_path = os.path.dirname(os.path.dirname(os.path.abspath(bot_core.__file__)))
+        bot_core_path = os.path.dirname(os.path.abspath(bot_core.__file__))
+        print('\n\nDEBUG bot_core_path: ', bot_core_path)
         # Tell Flask to look for templates in bot_core/templates
         flask_app.jinja_loader = ChoiceLoader([
             flask_app.jinja_loader,  # keep default template location
             FileSystemLoader(os.path.join(bot_core_path, 'templates')),  # add bot_core templates
         ])
+        print('\n\nDEBUG flask_app.jinja_loader.loaders: ', [l.searchpath for l in flask_app.jinja_loader.loaders if isinstance(l, FileSystemLoader)])
         # Tell Flask to look for static files in bot_core/static
         flask_app.register_blueprint(Blueprint(
             'bot_core',
