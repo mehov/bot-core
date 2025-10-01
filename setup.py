@@ -5,4 +5,7 @@ setup(
     version='1.0',
     packages=find_packages(where='.'),
     description='Reusable classes for building Telegram bots in Python',
+    install_requires = [
+        "requests",
+    ]
 )
