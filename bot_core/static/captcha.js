@@ -61,3 +61,29 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     };
 });
+
+// Listen for messages from the service worker
+navigator.serviceWorker.addEventListener("message", event => {
+    console.log('message', event);
+    /*
+  const data = event.data;
+
+  if (!data || !data.type) return;
+
+  switch (data.type) {
+    case "FETCH_FAIL":
+      console.warn("Fetch failed for:", data.url);
+      // Optional: dispatch a DOM CustomEvent for app-wide usage
+      document.dispatchEvent(
+        new CustomEvent("ServiceWorkerFetchFail", { detail: data })
+      );
+      break;
+
+    case "SOME_OTHER_EVENT":
+      console.log("Got another event:", data);
+      break;
+
+    default:
+      console.log("Unrecognized message from SW:", data);
+  }*/
+});

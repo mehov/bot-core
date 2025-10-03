@@ -15,6 +15,20 @@
             captcha_url = '{{ captcha_url }}';
             user_agent = '{{ user_agent }}';
             (async () => {
+                /*
+                let reg = await navigator.serviceWorker.register('{{ url_for('bot_core.static', filename='captcha-iframe-worker.js') }}', { scope: '/' });
+                await navigator.serviceWorker.ready;
+                reg.active?.postMessage({
+                    'type': 'config',
+                    'parent_url': window.location.href,
+                    'user_id': user_id,
+                    'challenge_id': challenge_id,
+                    'credentials_id': credentials_id,
+                    'provider': provider,
+                    'captcha_url': captcha_url,
+                    'user_agent': user_agent,
+                });
+                */
                 let iframe = document.getElementById('captcha');
                 iframe.src = iframe.dataset.src
             })();

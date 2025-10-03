@@ -7,5 +7,6 @@ setup(
     description='Reusable classes for building Telegram bots in Python',
     install_requires = [
         "requests",
-    ]
+    ],
+    include_package_data=True,  # required for MANIFEST.in to apply
 )

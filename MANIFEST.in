@@ -1,0 +1,2 @@
+recursive-include bot_core/templates *
+recursive-include bot_core/static *
