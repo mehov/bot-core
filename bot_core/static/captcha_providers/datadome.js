@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 report.open('POST', '/captcha-result', true);
                 report.setRequestHeader('Content-Type', 'application/json');
                 report.setRequestHeader('X-Provider', provider);
+                report.setRequestHeader('X-Challenge-Id', challenge_id);
                 report.setRequestHeader('X-User-Id', user_id);
                 report.setRequestHeader('X-Credentials-Id', credentials_id);
                 report.onload = function () {

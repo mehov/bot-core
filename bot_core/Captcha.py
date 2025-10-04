@@ -117,6 +117,9 @@ class Captcha:
             provider_name = request.headers.get('X-Provider')
             if not provider_name:
                 return "Missing 'X-Provider'", 400
+            challenge_id = request.headers.get('X-Challenge-Id')
+            if not challenge_id:
+                return "Missing 'X-Challenge-Id'", 400
             user_id = request.headers.get('X-User-Id')
             if not user_id:
                 return "Missing 'X-User-Id'", 400
@@ -126,5 +129,12 @@ class Captcha:
             provider_module = importlib.import_module(f"bot_core.captcha_providers.{provider_name}")
             provider_reference = getattr(provider_module, provider_name)
             provider = provider_reference(user_id=user_id, credentials_id=credentials_id)
-            return provider.receive_captcha_response(data)
+            result, status = provider.receive_captcha_response(data)
+            if status == 200:
+                challenge_path = Captcha.challenge_path(challenge_id)
+                if os.path.exists(challenge_path):
+                    os.remove(challenge_path)
+                if os.path.exists(challenge_path + '.json'):
+                    os.remove(challenge_path + '.json')
+            return result, status
 
