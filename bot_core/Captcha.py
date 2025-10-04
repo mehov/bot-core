@@ -72,12 +72,8 @@ class Captcha:
             metadata = json.load(open(challenge_path + '.json'))
             return render_template(
                 'captcha.html',
-                provider = metadata.get('provider'),
-                user_id = metadata.get('user_id'),
                 challenge_id = challenge_id,
-                credentials_id = metadata.get('credentials_id'),
-                captcha_url = metadata.get('captcha_url'),
-                user_agent = metadata.get('user_agent'),
+                metadata = metadata,
                 iframe_src = '/captcha-challenge?'+urlencode({'challenge_id': challenge_id})
             )
         # Define Flask route used as our-origin iframe SRC where we serve CAPTCHA challenge code
