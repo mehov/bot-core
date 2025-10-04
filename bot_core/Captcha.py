@@ -8,30 +8,44 @@ import os
 
 class Captcha:
 
+    def __init__(self, captcha_key, user_id, credentials_id):
+        """Start a new CAPTCHA handler where we expect to hit upstream challenge
+
+        Arguments:
+        captcha_key  unique key describing where and what we did to hit challenge
+        user_id  whose requests got hit with CAPTCHA
+        credentials_id  specific set used when hit with CAPTCHA
+        """
+        self.captcha_key = captcha_key
+        self.user_id = user_id
+        self.credentials_id = credentials_id
+
     @staticmethod
     def challenge_path(id):
         return f'/tmp/captcha-challenge-{id}'
 
-    def our_url(self, user_id, credentials_id, provider, captcha_url, challenge=None, user_agent=None):
+    def is_pending(self):
+        challenge_id = f'{self.captcha_key}-{self.user_id}-{self.credentials_id}'
+        challenge_path = Captcha.challenge_path(challenge_id)
+        return os.path.exists(challenge_path)
+
+    def challenge(self, provider, captcha_url, challenge=None, user_agent=None):
         """Convenience function to return URL where we re-serve the CAPTCHA
 
         Arguments:
-        user_id  whose requests got hit with CAPTCHA
-        credentials_id  specific set used when hit with CAPTCHA
-        provider
-        captcha_url
+        provider  'datadome'
+        captcha_url  CAPTCHA URL to re-serve through our proxy
         challenge  HTML code for CAPTCHA page (e.g. Cloudflare)
         user_agent  original user agent, use when proxying CAPTCHA requests
         """
-        import hashlib
-        challenge = challenge or ''  # + and f.write need challenge to be string
-        challenge_id = hashlib.sha256((challenge + captcha_url).encode('utf-8')).hexdigest()
+        challenge_id = f'{self.captcha_key}-{self.user_id}-{self.credentials_id}'
         challenge_path = Captcha.challenge_path(challenge_id)
         with open(challenge_path, 'w') as f:
-            f.write(challenge)
+            f.write(challenge or '')
         metadata = {
-            'user_id': user_id,
-            'credentials_id': credentials_id,
+            'captcha_key': self.captcha_key,
+            'user_id': self.user_id,
+            'credentials_id': self.credentials_id,
             'provider': provider,
             'captcha_url': captcha_url,
         }
