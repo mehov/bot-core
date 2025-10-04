@@ -8,7 +8,8 @@ import os
 
 class Captcha:
 
-    def challenge_path(self, id):
+    @staticmethod
+    def challenge_path(id):
         return f'/tmp/captcha-challenge-{id}'
 
     def our_url(self, user_id, credentials_id, provider, captcha_url, challenge=None, user_agent=None):
@@ -25,7 +26,7 @@ class Captcha:
         import hashlib
         challenge = challenge or ''  # + and f.write need challenge to be string
         challenge_id = hashlib.sha256((challenge + captcha_url).encode('utf-8')).hexdigest()
-        challenge_path = self.challenge_path(challenge_id)
+        challenge_path = Captcha.challenge_path(challenge_id)
         with open(challenge_path, 'w') as f:
             f.write(challenge)
         metadata = {
@@ -40,7 +41,8 @@ class Captcha:
             json.dump(metadata, f)
         return bot_core.utils.app_url()+'/captcha?'+urlencode({'challenge_id': challenge_id})
 
-    async def captcha_routes(self, flask_app, telegram_app):
+    @staticmethod
+    async def captcha_routes(flask_app, telegram_app):
         # Path to bot_core root containing /static and /templates
         bot_core_path = os.path.dirname(os.path.abspath(bot_core.__file__))
         print('\n\nDEBUG bot_core_path: ', bot_core_path)
@@ -61,7 +63,7 @@ class Captcha:
         @flask_app.route('/captcha')
         def captcha_serve_route():
             challenge_id = request.args.get('challenge_id')
-            challenge_path = self.challenge_path(challenge_id)
+            challenge_path = Captcha.challenge_path(challenge_id)
             if not os.path.exists(challenge_path):
                 return 'Provided challenge_id is not valid', 404
             if not os.path.exists(challenge_path + '.json'):
@@ -84,7 +86,7 @@ class Captcha:
             from flask import redirect
             import base64
             challenge_id = request.args.get('challenge_id')
-            challenge_path = self.challenge_path(challenge_id)
+            challenge_path = Captcha.challenge_path(challenge_id)
             if not os.path.exists(challenge_path):
                 return 'Provided challenge_id is not valid', 404
             if not os.path.exists(challenge_path + '.json'):

@@ -18,7 +18,8 @@ class Proxy:
             query['user_agent'] = user_agent
         return bot_core.utils.app_url()+'/proxy?'+urlencode(query)
 
-    async def proxy_routes(self, flask_app, telegram_app):
+    @staticmethod
+    async def proxy_routes(flask_app, telegram_app):
         """Callback to be used in Routes.py"""
         @flask_app.route('/proxy', methods=['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD'])
         def handle_proxy():

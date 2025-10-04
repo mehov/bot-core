@@ -19,24 +19,25 @@ class Routes:
         Register routes provided by the core
         :return: None
         """
-        # Dict of route names and their handlers
-        # None means route is provided by this class - make sure method exists with route's name
+        # Dict of route names and their handler classes
+        # Make sure static method exists in handler class with respective route name
         handlers = {
-            'home': None,
-            'webhook_endpoint': None,
-            'proxy_routes': Proxy(),
-            'captcha_routes': Captcha(),
+            'home': Routes,
+            'webhook_endpoint': Routes,
+            'proxy_routes': Proxy,
+            'captcha_routes': Captcha,
         }
         for name, handler_obj in handlers.items():
             # Skip if route has already been defined
             if name in self.flask_app.view_functions:
                 continue
             # Search for method with route name in handler class
-            handler = getattr(handler_obj or self, name, None)
+            handler = getattr(handler_obj, name, None)
             if handler:
                 await handler(self.flask_app, self.telegram_app)
 
-    async def home(self, flask_app, telegram_app):
+    @staticmethod
+    async def home(flask_app, telegram_app):
         @flask_app.route('/')
         async def home():
             return jsonify(
@@ -45,7 +46,8 @@ class Routes:
                 now=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             ), 200
 
-    async def webhook_endpoint(self, flask_app, telegram_app):
+    @staticmethod
+    async def webhook_endpoint(flask_app, telegram_app):
         # set webhook if HTTP_HOSTNAME present in environment
         hostname = config.get('HTTP_HOSTNAME')
         if hostname is None:
