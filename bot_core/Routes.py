@@ -15,6 +15,12 @@ class Routes:
         self.telegram_app = telegram_app
 
     async def register_core(self):
+        """
+        Register routes provided by the core
+        :return: None
+        """
+        # Dict of route names and their handlers
+        # None means route is provided by this class - make sure method exists with route's name
         handlers = {
             'home': None,
             'webhook_endpoint': None,
@@ -22,8 +28,10 @@ class Routes:
             'captcha_routes': Captcha(),
         }
         for name, handler_obj in handlers.items():
+            # Skip if route has already been defined
             if name in self.flask_app.view_functions:
                 continue
+            # Search for method with route name in handler class
             handler = getattr(handler_obj or self, name, None)
             if handler:
                 await handler(self.flask_app, self.telegram_app)
