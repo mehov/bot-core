@@ -3,7 +3,7 @@
     <head>
         <title>I, robot</title>
         <script type="text/javascript" src="{{ url_for('bot_core.static', filename='captcha.js') }}"></script>
-        <script type="text/javascript" src="{{ url_for('bot_core.static', filename='captcha_providers/'~provider~'.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('bot_core.static', filename='captcha_providers/'~metadata.provider~'.js') }}"></script>
     </head>
     <body>
         <iframe data-src="{{ iframe_src }}" id="captcha"></iframe>
