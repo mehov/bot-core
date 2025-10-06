@@ -1,7 +1,8 @@
 document.addEventListener('DOMContentLoaded', function () {
     window.__xhrHooks.onLoad.push(function () {
+        let json;
         try {
-            const json = JSON.parse(this.responseText);
+            json = JSON.parse(this.responseText);
         } catch (_) {}
         // Make sure we got JSON response
         if (typeof json !== 'object' || json === null || Object.keys(json).length < 1) {
