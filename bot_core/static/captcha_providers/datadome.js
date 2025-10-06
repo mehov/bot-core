@@ -2,31 +2,44 @@ document.addEventListener('DOMContentLoaded', function () {
     window.__xhrHooks.onLoad.push(function () {
         try {
             const json = JSON.parse(this.responseText);
-            // Make sure we got JSON response and it includes a new cookie
-            if (
-                typeof json === 'object' &&
-                json !== null &&
-                Object.keys(json).length === 1 &&
-                typeof json.cookie === 'string'
-            ) {
-                const report = new window.XMLHttpRequest();
-                // Send the new cookie back to us
-                report.open('POST', '/captcha-result', true);
-                report.setRequestHeader('Content-Type', 'application/json');
-                report.setRequestHeader('X-Provider', provider);
-                report.setRequestHeader('X-Captcha-Key', captcha_key);
-                report.setRequestHeader('X-Challenge-Id', challenge_id);
-                report.setRequestHeader('X-User-Id', user_id);
-                report.setRequestHeader('X-Credentials-Id', credentials_id);
-                report.onload = function () {
-                    if (report.status === 200) {
-                        window.close();
-                    } else {
-                        console.error('Failed to submit result:', report.status, report.responseText);
-                    }
-                };
-                report.send(JSON.stringify(json));
-            }
         } catch (_) {}
+        // Make sure we got JSON response
+        if (typeof json !== 'object' || json === null || Object.keys(json).length < 1) {
+            return;
+        }
+        // Make sure it includes a new cookie
+        if (typeof json.cookie !== 'string') {
+            return;
+        }
+        if (Object.keys(json).length > 1) {
+            // The one response with >1 elements that we know how to deal with is a new captcha
+            // Everything else - return early
+            if (json.view !== 'captcha' || typeof json.url !== 'string') {
+                return;
+            }
+        }
+        const report = new window.XMLHttpRequest();
+        // Send the new cookie back to us
+        report.open('POST', '/captcha-result', true);
+        report.setRequestHeader('Content-Type', 'application/json');
+        report.setRequestHeader('X-Provider', provider);
+        report.setRequestHeader('X-Captcha-Key', captcha_key);
+        report.setRequestHeader('X-Challenge-Id', challenge_id);
+        report.setRequestHeader('X-User-Id', user_id);
+        report.setRequestHeader('X-Credentials-Id', credentials_id);
+        report.onload = function () {
+            switch (report.status) {
+                case 200:
+                    window.close();
+                    break;
+                case 303:
+                    document.getElementById('captcha').contentWindow.location.reload();
+                    break;
+                default:
+                    console.error('Failed to submit result:', report.status, report.responseText);
+                    break;
+            }
+        };
+        report.send(JSON.stringify(json));
     });
 });
