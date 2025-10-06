@@ -56,6 +56,19 @@ class Captcha:
         return bot_core.utils.app_url()+'/captcha?'+urlencode({'challenge_id': challenge_id})
 
     @staticmethod
+    def read_challenge(self, challenge_id):
+        challenge_path = Captcha.challenge_path(challenge_id)
+        if not os.path.exists(challenge_path):
+            return 'Provided challenge_id is not valid', None, None
+        if not os.path.exists(challenge_path + '.json'):
+            return 'Challenge metadata missing', None, None
+        with open(challenge_path) as f:
+            challenge = f.read()
+        # Read challenge metadata into dict
+        metadata = json.load(open(challenge_path + '.json'))
+        return None, challenge, metadata
+
+    @staticmethod
     async def captcha_routes(flask_app, telegram_app):
         # Path to bot_core root containing /static and /templates
         bot_core_path = os.path.dirname(os.path.abspath(bot_core.__file__))
@@ -77,13 +90,9 @@ class Captcha:
         @flask_app.route('/captcha')
         def captcha_serve_route():
             challenge_id = request.args.get('challenge_id')
-            challenge_path = Captcha.challenge_path(challenge_id)
-            if not os.path.exists(challenge_path):
-                return 'Provided challenge_id is not valid', 404
-            if not os.path.exists(challenge_path + '.json'):
-                return 'Challenge metadata missing', 500
-            # Read challenge metadata into dict
-            metadata = json.load(open(challenge_path + '.json'))
+            error, challenge, metadata = Captcha.read_challenge(challenge_id)
+            if error:
+                return error, 500
             return render_template(
                 'captcha.html',
                 challenge_id = challenge_id,
@@ -94,17 +103,10 @@ class Captcha:
         @flask_app.route('/captcha-challenge', methods=['GET'])
         def captcha_challenge_route():
             from flask import redirect
-            import base64
             challenge_id = request.args.get('challenge_id')
-            challenge_path = Captcha.challenge_path(challenge_id)
-            if not os.path.exists(challenge_path):
-                return 'Provided challenge_id is not valid', 404
-            if not os.path.exists(challenge_path + '.json'):
-                return 'Challenge metadata missing', 500
-            # Read challenge content into variable
-            with open(challenge_path) as f:
-                challenge = f.read()
-            metadata = json.load(open(challenge_path + '.json'))
+            error, challenge, metadata = Captcha.read_challenge(challenge_id)
+            if error:
+                return error, 500
             if len(challenge) == 0 & metadata.get('captcha_url').startswith('http'):
                 return redirect(bot_core.Proxy().our_url(url=metadata.get('captcha_url'), user_agent=metadata.get('user_agent')), code=301)
             return challenge.encode('utf-8'), 200
