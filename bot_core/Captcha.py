@@ -20,12 +20,15 @@ class Captcha:
         self.user_id = user_id
         self.credentials_id = credentials_id
 
+    def challenge_id(self):
+        return f'{self.challenge_key}-{self.user_id}-{self.credentials_id}'
+
     @staticmethod
     def challenge_path(id):
         return f'/tmp/captcha-challenge-{id}'
 
     def is_pending(self):
-        challenge_id = f'{self.captcha_key}-{self.user_id}-{self.credentials_id}'
+        challenge_id = self.challenge_id()
         challenge_path = Captcha.challenge_path(challenge_id)
         return os.path.exists(challenge_path)
 
@@ -38,7 +41,7 @@ class Captcha:
         challenge  HTML code for CAPTCHA page (e.g. Cloudflare)
         user_agent  original user agent, use when proxying CAPTCHA requests
         """
-        challenge_id = f'{self.captcha_key}-{self.user_id}-{self.credentials_id}'
+        challenge_id = self.challenge_id()
         challenge_path = Captcha.challenge_path(challenge_id)
         with open(challenge_path, 'w') as f:
             f.write(challenge or '')
