@@ -59,7 +59,7 @@ class Captcha:
         return bot_core.utils.app_url()+'/captcha?'+urlencode({'challenge_id': challenge_id})
 
     @staticmethod
-    def read_challenge(self, challenge_id):
+    def read_challenge(challenge_id):
         challenge_path = Captcha.challenge_path(challenge_id)
         if not os.path.exists(challenge_path):
             return 'Provided challenge_id is not valid', None, None
