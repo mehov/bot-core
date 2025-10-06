@@ -21,7 +21,7 @@ class Captcha:
         self.credentials_id = credentials_id
 
     def challenge_id(self):
-        return f'{self.challenge_key}-{self.user_id}-{self.credentials_id}'
+        return f'{self.captcha_key}-{self.user_id}-{self.credentials_id}'
 
     @staticmethod
     def challenge_path(id):
