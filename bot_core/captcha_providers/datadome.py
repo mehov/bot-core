@@ -15,7 +15,9 @@ class datadome(BaseProvider):
             return "Invalid JSON data", 400
         if data['view'] == 'captcha':
             new_captcha = Captcha(captcha_key=self.captcha_key, user_id=self.user_id, credentials_id=self.credentials_id)
-            error, challenge, metadata = Captcha.read_challenge(new_captcha.challenge_id())
+            challenge_id = new_captcha.challenge_id()
+            error, challenge, metadata = Captcha.read_challenge(challenge_id)
+            print(f'\n\nCaptcha.read_challenge({challenge_id})\nError: {error}\nChallenge: {challenge}\nMetadata:\n{json.dumps(metadata, indent=4)}')
             if error:
                 return error, 500
             # Trigger saving new captcha URL
