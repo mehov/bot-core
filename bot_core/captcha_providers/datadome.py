@@ -21,7 +21,7 @@ class datadome(BaseProvider):
             if error:
                 return error, 500
             # Trigger saving new captcha URL
-            new_captcha.challenge(provider='datadome', captcha_url=data['url'], user_agent=metadata.user_agent)
+            new_captcha.challenge(provider='datadome', captcha_url=data['url'], user_agent=metadata.get('user_agent'))
             return data, 303
         obj = Credentials(self.user_id)
         all = obj.all()
