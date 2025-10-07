@@ -137,12 +137,12 @@ class Captcha:
             provider_module = importlib.import_module(f"bot_core.captcha_providers.{provider_name}")
             provider_reference = getattr(provider_module, provider_name)
             provider = provider_reference(captcha_key=captcha_key, user_id=user_id, credentials_id=credentials_id)
-            response = provider.receive_captcha_response(data)
-            if response.status_code == 200:
+            response, status_code, headers = provider.receive_captcha_response(data)
+            if status_code == 200:
                 challenge_path = Captcha.challenge_path(challenge_id)
                 if os.path.exists(challenge_path):
                     os.remove(challenge_path)
                 if os.path.exists(challenge_path + '.json'):
                     os.remove(challenge_path + '.json')
-            return response
+            return response, status_code, headers
 
