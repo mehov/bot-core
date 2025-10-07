@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     window.close();
                     break;
                 case 303:
-                    document.getElementById('captcha').contentWindow.location.reload();
+                    window.location.reload();
                     break;
                 default:
                     console.error('Failed to submit result:', report.status, report.responseText);
