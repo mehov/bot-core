@@ -3,6 +3,7 @@ from flask import Response
 from bot_core.captcha_providers import BaseProvider
 from bot_core import Captcha
 from bot_core import Credentials
+from bot_core import utils
 
 
 class datadome(BaseProvider):
@@ -23,7 +24,13 @@ class datadome(BaseProvider):
                 return Response(error, 500)
             # Trigger saving new captcha URL
             new_captcha.challenge(provider='datadome', captcha_url=data['url'], user_agent=metadata.get('user_agent'))
-            return Response(data, 303)
+            # Start building Response object
+            # Pass cookie we received - so that it's used for the new captcha
+            cookie = data['cookie']
+            # Edit cookie Domain
+            import re
+            cookie = re.sub(r'Domain=[^;]+', f'Domain=.{utils.app_host()}', cookie)
+            return Response(data, 303, headers={'Set-Cookie': cookie})
         obj = Credentials(self.user_id)
         all = obj.all()
         all[int(self.credentials_id)]['cookie'] = data['cookie']

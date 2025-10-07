@@ -16,9 +16,13 @@ def app_identifier() -> str:
     return 'bot'
 
 
+def app_host() -> str:
+    return os.getenv('HTTP_HOST') or os.getenv('HTTP_HOSTNAME') or '127.0.0.1'
+
+
 def app_url() -> str:
     env_port = os.getenv('HTTP_PORT')
-    return '//' + (os.getenv('HTTP_HOST') or os.getenv('HTTP_HOSTNAME') or '127.0.0.1') + (f':{env_port}' if env_port else '')
+    return '//' + app_host() + (f':{env_port}' if env_port else '')
 
 
 def run_command(command, arguments=None):
